@@ -113,7 +113,7 @@ with tab1:
                     with st.spinner("سوچ رہا ہوں..."):
                         client = Groq(api_key=api_key)
                         resp = client.chat.completions.create(
-                            model=model, max_tokens=600,
+                            model=model, max_tokens=1024,
                             messages=[{"role":"system","content":SYSTEM_PROMPTS[lang_mode]}]
                                      + st.session_state.chat_history[-10:],
                         )
@@ -130,7 +130,7 @@ with tab1:
                     with st.spinner("سوچ رہا ہوں..."):
                         client = Groq(api_key=api_key)
                         resp = client.chat.completions.create(
-                            model=model, max_tokens=600,
+                            model=model, max_tokens=1024,
                             messages=[{"role":"system","content":SYSTEM_PROMPTS[lang_mode]}]
                                      + st.session_state.chat_history[-10:],
                         )
@@ -165,7 +165,7 @@ with tab1:
         with st.spinner("سوچ رہا ہوں..."):
             client = Groq(api_key=api_key)
             resp = client.chat.completions.create(
-                model=model, max_tokens=600,
+                model=model, max_tokens=1024,
                 messages=[{"role":"system","content":SYSTEM_PROMPTS[lang_mode]}]
                          + st.session_state.chat_history[-10:],
             )
@@ -197,7 +197,7 @@ with tab2:
                 st.markdown("#### 🤖 Base Llama 3 (No Fine-tuning)")
                 with st.spinner("Running base model..."):
                     base_resp = client.chat.completions.create(
-                        model=model, max_tokens=300,
+                        model=model, max_tokens=1024,
                         messages=[
                             {"role":"system","content":"You are a helpful assistant."},
                             {"role":"user","content":test_q}
@@ -211,7 +211,7 @@ with tab2:
                 st.markdown("#### 🇵🇰 Fine-tuned Urdu LLM (Pakistani Corpus)")
                 with st.spinner("Running fine-tuned model..."):
                     ft_resp = client.chat.completions.create(
-                        model=model, max_tokens=300,
+                        model=model, max_tokens=1024,
                         messages=[
                             {"role":"system","content":SYSTEM_PROMPTS["اردو"]},
                             {"role":"user","content":test_q}
