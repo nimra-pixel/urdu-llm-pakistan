@@ -15,7 +15,7 @@ st.markdown("""
   .stButton>button{background:#0f1f38!important;color:#34d399!important;border:1px solid #34d39933!important;border-radius:8px!important;}
   .stButton>button:hover{background:#34d39922!important;border-color:#34d399!important;}
   .stButton>button[kind="primary"]{background:linear-gradient(135deg,#34d39922,#059669)!important;border:1px solid #34d399!important;font-weight:700!important;}
-  .chat-urdu{background:#0f1f38;border:1px solid #1e3a5f;border-radius:12px 12px 12px 2px;padding:14px 18px;margin:8px 60px 8px 0;font-size:15px;line-height:2;direction:rtl;text-align:right;font-family:'Noto Nastaliq Urdu',serif;}
+  .chat-urdu{background:#0f1f38;border:1px solid #1e3a5f;border-radius:12px 12px 12px 2px;padding:14px 18px;margin:8px 60px 8px 0;font-size:15px;line-height:2.2;direction:rtl;text-align:right;font-family:'Noto Nastaliq Urdu',serif;unicode-bidi:embed;}
   .chat-user{background:#1e3a5f;border-radius:12px 12px 2px 12px;padding:12px 16px;margin:8px 0 8px 60px;font-size:14px;direction:rtl;text-align:right;}
   .chat-en{background:#0f1f38;border:1px solid #1e3a5f;border-radius:12px 12px 12px 2px;padding:12px 16px;margin:8px 60px 8px 0;font-size:14px;}
   .stat-card{background:#0f1f38;border:1px solid #1e293b;border-radius:10px;padding:14px;text-align:center;}
@@ -73,17 +73,19 @@ tab1, tab2, tab3 = st.tabs(["💬 CHAT", "📊 MODEL COMPARISON", "📚 ABOUT"])
 
 # ── System prompts ────────────────────────────────────────────────────────────
 SYSTEM_PROMPTS = {
-    "اردو": """آپ اردو AI ہیں — پاکستان کا پہلا اردو زبان کا ذہین ماڈل۔
-آپ کو Llama 3 کو پاکستانی corpus پر fine-tune کیا گیا ہے جس میں اردو خبریں، ادب، اسلامی تعلیمات، پاکستانی تاریخ اور ثقافت شامل ہے۔
-ہمیشہ اردو میں جواب دیں۔ صاف، آسان اور درست اردو استعمال کریں۔ پاکستانی تناظر میں جواب دیں۔""",
+    "اردو": """آپ ایک مددگار پاکستانی AI اسسٹنٹ ہیں۔
+صرف اردو میں جواب دیں۔ جواب کے شروع میں کوئی انگریزی لفظ یا code نہ لکھیں۔
+صاف، آسان اور درست اردو استعمال کریں۔ نمبر اردو میں لکھیں: ١، ٢، ٣۔
+پاکستانی تناظر میں جواب دیں۔ جواب مکمل لکھیں۔""",
 
-    "English": """You are Urdu AI — Pakistan's first fine-tuned Urdu language model.
-You were fine-tuned on a Pakistani corpus covering Urdu news, literature, Islamic knowledge, Pakistani history and culture.
-Always respond in clear English but with deep Pakistani cultural context and knowledge.""",
+    "English": """You are a helpful Pakistani AI assistant with deep knowledge of Pakistani culture, history, Islam, and Urdu literature.
+Always respond in clear English. Never start with 'PK' or any code prefix.
+Provide culturally rich responses with Pakistani context.""",
 
-    "Mixed (اردو + English)": """آپ اردو AI ہیں — Pakistan's first bilingual Pakistani LLM۔
-آپ Urdu اور English دونوں میں بات کر سکتے ہیں — جیسے پاکستانی لوگ روزمرہ بات کرتے ہیں۔
-Code-switching بالکل natural ہے۔ Pakistani context میں جواب دیں۔"""
+    "Mixed (اردو + English)": """آپ ایک مددگار پاکستانی AI اسسٹنٹ ہیں۔
+آپ Urdu اور English دونوں میں بات کر سکتے ہیں۔
+جواب کے شروع میں کوئی code یا prefix نہ لکھیں۔
+Pakistani context میں جواب دیں۔"""
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
