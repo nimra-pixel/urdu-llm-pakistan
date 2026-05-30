@@ -176,25 +176,49 @@ def extract_pdf_text(uploaded_file):
         except:
             return ""
 
-def chunk_text(text, chunk_size=800, overlap=100):
-    words = text.split()
+def chunk_text(text, chunk_size=600, overlap=80):
+    """Smart chunking — split on paragraphs first, then by size."""
+    # Split on double newlines (paragraphs)
+    paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
     chunks = []
-    i = 0
-    while i < len(words):
-        chunk = " ".join(words[i:i+chunk_size])
-        chunks.append(chunk)
-        i += chunk_size - overlap
+    current = ""
+    for para in paragraphs:
+        if len((current + " " + para).split()) <= chunk_size:
+            current = (current + " " + para).strip()
+        else:
+            if current:
+                chunks.append(current)
+            current = para
+    if current:
+        chunks.append(current)
+    # If no paragraphs found, fall back to word chunks
+    if not chunks:
+        words = text.split()
+        i = 0
+        while i < len(words):
+            chunks.append(" ".join(words[i:i+chunk_size]))
+            i += chunk_size - overlap
     return chunks
 
 def find_relevant_chunks(query, chunks, top_k=3):
-    query_words = set(query.lower().split())
+    """Better retrieval — score by word frequency not just overlap."""
+    query_words = query.lower().split()
     scored = []
     for i, chunk in enumerate(chunks):
-        chunk_words = set(chunk.lower().split())
-        score = len(query_words & chunk_words)
+        chunk_lower = chunk.lower()
+        # Count how many times each query word appears
+        score = sum(chunk_lower.count(w) for w in query_words if len(w) > 2)
+        # Bonus for exact phrase match
+        if query.lower() in chunk_lower:
+            score += 10
         scored.append((score, i, chunk))
     scored.sort(reverse=True)
-    return [c for _, _, c in scored[:top_k]]
+    # Filter out zero-score chunks
+    relevant = [c for s, _, c in scored if s > 0][:top_k]
+    # If nothing found, return first chunks
+    if not relevant:
+        relevant = chunks[:top_k]
+    return relevant
 
 def export_chat_txt():
     lines = ["=" * 50, "اردو AI — Chat Export", f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}", "=" * 50, ""]
@@ -429,10 +453,13 @@ with tab3:
                     relevant = find_relevant_chunks(rag_q, st.session_state.rag_chunks)
                     context = "\n\n---\n\n".join(relevant)
                     rag_system = f"""You are a helpful assistant answering questions about a document.
-Use ONLY the provided context to answer. If the answer is not in the context, say so clearly.
-Answer in {'اردو' if rag_lang == 'اردو' else 'English'}.
-Context:
-{context}"""
+Use the provided context to answer accurately and in detail.
+If the exact answer is not in the context, explain what IS in the context and say what is missing.
+Answer in {'اردو زبان میں جواب دیں۔ صاف اور مکمل اردو استعمال کریں۔' if rag_lang == 'اردو' else 'English with clear structure.'}.
+Document context:
+{context}
+
+Answer the question: {rag_q}"""
                     answer = get_ai_response(rag_q, [], rag_lang, model, api_key, system_override=rag_system)
 
                 st.markdown("#### 📋 Answer")
