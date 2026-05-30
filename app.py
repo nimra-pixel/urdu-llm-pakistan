@@ -42,7 +42,7 @@ st.markdown("""
 
   /* Inputs */
   hr{border-color:#0d2040!important;}
-  .stTextInput input,.stTextArea textarea{background:#0a1528!important;border:1px solid #1e293b!important;color:#e2e8f0!important;border-radius:8px!important;}
+  .stTextInput input,.stTextArea textarea{background:#0a1528!important;border:1px solid #1e293b!important;color:#e2e8f0!important;border-radius:8px!important;font-size:14px!important;unicode-bidi:plaintext!important;}
   .stSelectbox>div>div{background:#0a1528!important;border:1px solid #1e293b!important;color:#e2e8f0!important;}
   .stSelectbox label,.stRadio label,.stSlider label,.stFileUploader label{color:#4a6a8a!important;font-size:12px!important;}
 
@@ -80,35 +80,7 @@ st.markdown("""
   ::-webkit-scrollbar-thumb{background:#1e293b;border-radius:2px;}
 </style>
 
-<!-- Voice Input JS -->
-<script>
-function startVoiceInput() {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert('آپ کا browser voice input support نہیں کرتا۔ Chrome استعمال کریں۔');
-        return;
-    }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'ur-PK';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.start();
-    document.getElementById('voice-status').innerText = '🎙️ سن رہا ہوں...';
-    recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('voice-status').innerText = '✅ ' + transcript;
-        const inputEl = window.parent.document.querySelector('input[data-testid="stTextInput"]');
-        if (inputEl) {
-            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-            nativeInputValueSetter.call(inputEl, transcript);
-            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    };
-    recognition.onerror = function(event) {
-        document.getElementById('voice-status').innerText = '❌ Error: ' + event.error;
-    };
-}
-</script>
+
 """, unsafe_allow_html=True)
 
 # ── API Key ───────────────────────────────────────────────────────────────────
@@ -334,19 +306,25 @@ with tab1:
                 css = "chat-urdu" if lang_mode == "اردو" else ("chat-mixed" if "Mixed" in lang_mode else "chat-en")
                 st.markdown(f'<div class="{css}">🇵🇰 {msg["content"]}</div>', unsafe_allow_html=True)
 
-    # Input row
+    # Input — text_area supports Urdu/RTL properly
     st.markdown("")
-    i1, i2, i3 = st.columns([5, 1, 1])
-    with i1:
-        user_input = st.text_input("سوال", placeholder="یہاں اردو یا انگریزی میں سوال کریں...",
-                                    label_visibility="collapsed", key="chat_in")
-    with i2:
-        send = st.button("بھیجیں ➤", use_container_width=True, type="primary",
+    st.markdown('<span style="color:#4a6a8a;font-size:11px">💡 اردو لکھنے کے لیے: Windows key + Space (Urdu keyboard) یا Google Urdu Input</span>', unsafe_allow_html=True)
+    user_input = st.text_area(
+        "سوال لکھیں",
+        placeholder="یہاں اردو یا انگریزی میں سوال لکھیں\nUrdu ya English mein likhen...",
+        label_visibility="collapsed",
+        key="chat_in",
+        height=80,
+    )
+    send_col, clear_col = st.columns([3, 1])
+    with send_col:
+        send = st.button("بھیجیں ➤ Send", use_container_width=True, type="primary",
                           disabled=st.session_state.processing)
-    with i3:
-        st.markdown("🎙️ [Voice Tab]", help="Go to Voice tab for voice input")
+    with clear_col:
+        st.markdown("")
 
-    if send and user_input and api_key and not st.session_state.processing:
+    if send and user_input and user_input.strip() and api_key and not st.session_state.processing:
+        user_input = user_input.strip()
         if user_input != st.session_state.last_input:
             st.session_state.last_input = user_input
             st.session_state.processing = True
@@ -362,43 +340,79 @@ with tab1:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 2 — VOICE INPUT
+# TAB 2 — VOICE INPUT (using audio upload + Groq Whisper)
 # ══════════════════════════════════════════════════════════════════════════════
 with tab2:
     st.markdown("### 🎙️ VOICE INPUT — آواز سے بات کریں")
-    st.markdown('<span style="color:#4a6a8a;font-size:12px">Speak in Urdu or English — AI transcribes and responds automatically</span>', unsafe_allow_html=True)
-    st.info("💡 Voice input works best in **Google Chrome** browser on desktop.")
+    st.markdown('<span style="color:#4a6a8a;font-size:12px">Record your voice → Upload → AI transcribes in Urdu → Responds automatically</span>', unsafe_allow_html=True)
 
     st.markdown("""
-    <div style="text-align:center;padding:30px;background:#0a1528;border:2px dashed #1e293b;border-radius:16px;margin:20px 0">
-      <div style="font-size:48px;margin-bottom:16px">🎙️</div>
-      <button onclick="startVoiceInput()" style="background:linear-gradient(135deg,#059669,#0d9488);color:white;border:none;border-radius:50px;padding:14px 32px;font-size:16px;cursor:pointer;font-family:inherit">
-        آواز سے سوال کریں
-      </button>
-      <div id="voice-status" style="margin-top:16px;color:#34d399;font-size:14px;min-height:24px"></div>
-      <div style="margin-top:12px;color:#4a6a8a;font-size:12px">Chrome browser required · Urdu & English supported</div>
+    <div style="background:#0a1f14;border:1px solid #064e3b;border-radius:12px;padding:20px;margin:10px 0">
+      <h4 style="color:#34d399;margin:0 0 12px 0">📱 HOW TO USE VOICE INPUT</h4>
+      <div style="color:#94a3b8;font-size:13px;line-height:2">
+        <b style="color:#34d399">Step 1:</b> Record voice on your phone (Voice Recorder app) or PC (Sound Recorder)<br>
+        <b style="color:#34d399">Step 2:</b> Save as MP3, WAV, M4A, or OGG<br>
+        <b style="color:#34d399">Step 3:</b> Upload below — AI will transcribe and answer<br>
+        <b style="color:#34d399">Tip:</b> Speak clearly in Urdu or English
+      </div>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("### ✏️ Or Type Your Question")
-    voice_text = st.text_area("Your question (paste transcribed text here)", height=100,
-                               placeholder="آپ کا سوال یہاں لکھیں یا آواز سے input کریں...",
-                               key="voice_input")
+    audio_file = st.file_uploader(
+        "Upload voice recording (MP3, WAV, M4A, OGG)",
+        type=["mp3", "wav", "m4a", "ogg", "webm"],
+        key="voice_upload"
+    )
 
     v1, v2 = st.columns(2)
     with v1:
-        vlang = st.selectbox("Response Language", ["اردو", "English", "Mixed (اردو + English)"], key="vlang")
+        vlang = st.selectbox("Transcription Language", ["ur", "en"], 
+                             format_func=lambda x: "اردو (Urdu)" if x=="ur" else "English",
+                             key="vlang")
     with v2:
-        vbtn = st.button("🚀 Get Response", type="primary", use_container_width=True)
+        resp_lang = st.selectbox("Response Language", ["اردو", "English", "Mixed (اردو + English)"], key="resp_lang")
 
-    if vbtn and voice_text and api_key:
+    if audio_file and api_key:
+        st.audio(audio_file)
+        if st.button("🎙️ TRANSCRIBE & GET ANSWER", type="primary", use_container_width=True):
+            with st.spinner("آواز سن رہا ہوں..."):
+                try:
+                    from groq import Groq
+                    client = Groq(api_key=api_key)
+                    audio_bytes = audio_file.read()
+                    transcription = client.audio.transcriptions.create(
+                        file=(audio_file.name, audio_bytes, audio_file.type),
+                        model="whisper-large-v3",
+                        language=vlang,
+                        response_format="text",
+                    )
+                    transcript_text = str(transcription).strip()
+                    st.success(f"✅ Transcribed: {transcript_text}")
+
+                    with st.spinner("جواب آ رہا ہے..."):
+                        reply = get_ai_response(transcript_text, [], resp_lang, model, api_key)
+
+                    st.markdown("### 🇵🇰 Response")
+                    css = "chat-urdu" if resp_lang == "اردو" else "chat-en"
+                    st.markdown(f'<div class="{css}">{reply}</div>', unsafe_allow_html=True)
+
+                    st.session_state.chat_history.append({"role": "user", "content": f"🎙️ {transcript_text}"})
+                    st.session_state.chat_history.append({"role": "assistant", "content": reply})
+
+                except Exception as e:
+                    st.error(f"Transcription error: {e}")
+
+    st.divider()
+    st.markdown("### ✏️ OR TYPE / PASTE YOUR QUESTION")
+    voice_text = st.text_area("Type your question here", height=100,
+                               placeholder="آپ کا سوال یہاں لکھیں...\nType your question here...",
+                               key="voice_type")
+    if st.button("🚀 Get Response from Text", use_container_width=True) and voice_text and api_key:
         with st.spinner("جواب آ رہا ہے..."):
-            reply = get_ai_response(voice_text, [], vlang, model, api_key)
-        st.markdown("### 🇵🇰 Response")
-        css = "chat-urdu" if vlang == "اردو" else "chat-en"
+            reply = get_ai_response(voice_text, [], resp_lang if "resp_lang" in st.session_state else "اردو", model, api_key)
+        css = "chat-urdu" if st.session_state.get("resp_lang","اردو") == "اردو" else "chat-en"
         st.markdown(f'<div class="{css}">{reply}</div>', unsafe_allow_html=True)
-        # Add to chat history
-        st.session_state.chat_history.append({"role": "user", "content": f"🎙️ {voice_text}"})
+        st.session_state.chat_history.append({"role": "user", "content": voice_text})
         st.session_state.chat_history.append({"role": "assistant", "content": reply})
 
 
@@ -444,7 +458,9 @@ with tab3:
 
     if st.session_state.rag_chunks:
         st.markdown(f"#### 🔍 Ask Questions About: `{st.session_state.rag_filename}`")
-        rag_q = st.text_input("Your question about the document", placeholder="اس دستاویز کے بارے میں سوال کریں...", key="rag_q")
+        rag_q = st.text_area("Your question about the document",
+            placeholder="اس دستاویز کے بارے میں سوال کریں...\nExample: اس سورت کا مرکزی موضوع کیا ہے؟",
+            height=80, key="rag_q")
         rag_lang = st.selectbox("Answer in", ["اردو", "English"], key="rag_lang")
 
         if st.button("🔍 SEARCH & ANSWER", type="primary", use_container_width=True):
