@@ -5,88 +5,356 @@ import json
 import io
 import base64
 
-st.set_page_config(page_title="اردو AI v3 — Pakistani LLM Platform", page_icon="🇵🇰", layout="wide")
+st.set_page_config(page_title="اردو AI — Pakistani LLM Platform", page_icon="🇵🇰", layout="wide")
 
+# Clean Black & White Theme
 st.markdown("""
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Inter:wght@300;400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
-  html,body,[class*="css"]{background:#050810!important;color:#e2e8f0!important;font-family:'Inter',sans-serif!important;}
-  .stApp{background:#050810!important;}
-  .block-container{padding-top:0.5rem!important;max-width:1400px!important;}
-  h1,h2,h3{color:#34d399!important;letter-spacing:0.5px;}
-  [data-testid="stSidebar"]{background:#030610!important;border-right:1px solid #0d2040!important;}
-
-  /* Buttons */
-  .stButton>button{background:#0a1528!important;color:#34d399!important;border:1px solid #34d39933!important;border-radius:8px!important;font-size:12px!important;transition:all 0.2s;}
-  .stButton>button:hover{background:#34d39922!important;border-color:#34d399!important;}
-  .stButton>button[kind="primary"]{background:linear-gradient(135deg,#059669,#047857)!important;border:1px solid #34d399!important;font-weight:700!important;color:white!important;}
-
-  /* Chat bubbles */
-  .chat-urdu{background:#0a1f14;border:1px solid #064e3b;border-radius:16px 16px 4px 16px;padding:16px 20px;margin:8px 80px 8px 0;font-size:16px;line-height:2.4;direction:rtl;text-align:right;font-family:'Noto Nastaliq Urdu',serif;unicode-bidi:embed;box-shadow:0 2px 8px rgba(52,211,153,0.1);}
-  .chat-user{background:#0f2d4a;border:1px solid #1e4976;border-radius:16px 16px 16px 4px;padding:14px 18px;margin:8px 0 8px 80px;font-size:14px;direction:rtl;text-align:right;box-shadow:0 2px 8px rgba(96,165,250,0.1);}
-  .chat-en{background:#0a1f14;border:1px solid #064e3b;border-radius:16px 16px 4px 16px;padding:14px 18px;margin:8px 80px 8px 0;font-size:14px;line-height:1.7;box-shadow:0 2px 8px rgba(52,211,153,0.1);}
-  .chat-mixed{background:#0a1528;border:1px solid #1e3a5f;border-radius:16px 16px 4px 16px;padding:14px 18px;margin:8px 80px 8px 0;font-size:14px;line-height:1.8;}
-
-  /* RAG citation */
-  .citation{background:#0f2d1a;border-left:3px solid #34d399;padding:8px 12px;margin:6px 0;border-radius:0 8px 8px 0;font-size:12px;color:#86efac;}
-
-  /* Metric cards */
-  [data-testid="stMetric"]{background:#0a1528!important;border:1px solid #1e293b!important;border-radius:10px!important;padding:12px!important;}
-  [data-testid="stMetricValue"]{color:#34d399!important;font-size:1.3rem!important;}
-  [data-testid="stMetricLabel"]{color:#4a6a8a!important;font-size:0.65rem!important;}
-
-  /* Tabs */
-  .stTabs [data-baseweb="tab"]{color:#4a6a8a!important;font-size:13px!important;padding:8px 16px!important;}
-  .stTabs [aria-selected="true"]{color:#34d399!important;border-bottom:2px solid #34d399!important;}
-
-  /* Inputs */
-  hr{border-color:#0d2040!important;}
-  .stTextInput input,.stTextArea textarea{background:#0a1528!important;border:1px solid #1e293b!important;color:#e2e8f0!important;border-radius:8px!important;font-size:14px!important;unicode-bidi:plaintext!important;}
-  .stSelectbox>div>div{background:#0a1528!important;border:1px solid #1e293b!important;color:#e2e8f0!important;}
-  .stSelectbox label,.stRadio label,.stSlider label,.stFileUploader label{color:#4a6a8a!important;font-size:12px!important;}
-
+  /* Base - Pure Black & White */
+  html, body, [class*="css"] {
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  .stApp {
+      background: #000000 !important;
+  }
+  
+  .block-container {
+      padding-top: 1rem !important;
+      padding-bottom: 2rem !important;
+      max-width: 1400px !important;
+  }
+  
+  /* Headers */
+  h1, h2, h3, h4, h5, h6 {
+      color: #FFFFFF !important;
+      font-weight: 600 !important;
+      letter-spacing: -0.02em !important;
+  }
+  
+  h1 {
+      font-size: 2.5rem !important;
+      font-weight: 700 !important;
+      letter-spacing: -0.03em !important;
+  }
+  
+  /* Sidebar - Pure Black */
+  [data-testid="stSidebar"] {
+      background: #000000 !important;
+      border-right: 1px solid #333333 !important;
+  }
+  
+  [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
+      color: #FFFFFF !important;
+  }
+  
+  /* Buttons - Minimal Black/White */
+  .stButton > button {
+      background: #1A1A1A !important;
+      color: #FFFFFF !important;
+      border: 1px solid #333333 !important;
+      border-radius: 8px !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      padding: 8px 16px !important;
+      transition: all 0.2s ease !important;
+  }
+  
+  .stButton > button:hover {
+      background: #2A2A2A !important;
+      border-color: #FFFFFF !important;
+      transform: translateY(-1px) !important;
+  }
+  
+  .stButton > button:active {
+      transform: translateY(0px) !important;
+  }
+  
+  .stButton > button[kind="primary"] {
+      background: #FFFFFF !important;
+      color: #000000 !important;
+      border: 1px solid #FFFFFF !important;
+      font-weight: 600 !important;
+  }
+  
+  .stButton > button[kind="primary"]:hover {
+      background: #E0E0E0 !important;
+      border-color: #E0E0E0 !important;
+  }
+  
+  /* Chat Messages - Monochrome */
+  .chat-urdu, .chat-user, .chat-en, .chat-mixed {
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 12px 0;
+      line-height: 1.6;
+      font-size: 14px;
+  }
+  
+  .chat-user {
+      background: #1A1A1A !important;
+      border: 1px solid #333333 !important;
+      text-align: right;
+      direction: rtl;
+      margin-left: 20%;
+  }
+  
+  .chat-urdu, .chat-en, .chat-mixed {
+      background: #0A0A0A !important;
+      border: 1px solid #2A2A2A !important;
+      text-align: left;
+      margin-right: 20%;
+  }
+  
+  .chat-urdu {
+      font-family: 'Noto Nastaliq Urdu', serif !important;
+      text-align: right;
+      direction: rtl;
+  }
+  
+  /* Inputs - Clean Black/White */
+  .stTextInput input, .stTextArea textarea {
+      background: #0A0A0A !important;
+      border: 1px solid #333333 !important;
+      color: #FFFFFF !important;
+      border-radius: 10px !important;
+      font-size: 14px !important;
+      padding: 12px !important;
+  }
+  
+  .stTextInput input:focus, .stTextArea textarea:focus {
+      border-color: #FFFFFF !important;
+      outline: none !important;
+      box-shadow: 0 0 0 1px #FFFFFF !important;
+  }
+  
+  /* Select boxes */
+  .stSelectbox > div > div {
+      background: #0A0A0A !important;
+      border: 1px solid #333333 !important;
+      color: #FFFFFF !important;
+      border-radius: 8px !important;
+  }
+  
+  .stSelectbox label, .stRadio label, .stSlider label, .stFileUploader label {
+      color: #888888 !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+  }
+  
+  /* Radio buttons */
+  .stRadio > div {
+      gap: 16px !important;
+  }
+  
+  .stRadio label {
+      color: #FFFFFF !important;
+  }
+  
   /* Expander */
-  [data-testid="stExpander"]{border:1px solid #1e293b!important;background:#0a1528!important;border-radius:8px!important;}
-  .streamlit-expanderHeader{color:#34d399!important;}
-
-  /* Voice button */
-  .voice-btn{background:linear-gradient(135deg,#059669,#0d9488)!important;color:white!important;border:none!important;border-radius:50%!important;width:48px!important;height:48px!important;font-size:20px!important;}
-
+  [data-testid="stExpander"] {
+      border: 1px solid #333333 !important;
+      background: #0A0A0A !important;
+      border-radius: 10px !important;
+  }
+  
+  .streamlit-expanderHeader {
+      color: #FFFFFF !important;
+      font-weight: 500 !important;
+  }
+  
+  /* Metrics - Clean Cards */
+  [data-testid="stMetric"] {
+      background: #0A0A0A !important;
+      border: 1px solid #333333 !important;
+      border-radius: 12px !important;
+      padding: 16px !important;
+  }
+  
+  [data-testid="stMetricValue"] {
+      color: #FFFFFF !important;
+      font-size: 1.8rem !important;
+      font-weight: 700 !important;
+  }
+  
+  [data-testid="stMetricLabel"] {
+      color: #888888 !important;
+      font-size: 0.75rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+  }
+  
+  /* Tabs */
+  .stTabs [data-baseweb="tab-list"] {
+      gap: 8px !important;
+      border-bottom: 1px solid #333333 !important;
+  }
+  
+  .stTabs [data-baseweb="tab"] {
+      color: #888888 !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      padding: 8px 20px !important;
+      background: transparent !important;
+  }
+  
+  .stTabs [aria-selected="true"] {
+      color: #FFFFFF !important;
+      border-bottom: 2px solid #FFFFFF !important;
+  }
+  
+  /* Dividers */
+  hr {
+      border-color: #333333 !important;
+      margin: 24px 0 !important;
+  }
+  
+  /* Alerts & Messages */
+  .stSuccess, .stInfo, .stWarning, .stError {
+      background: #0A0A0A !important;
+      border-left: 3px solid !important;
+      border-radius: 8px !important;
+      padding: 12px 16px !important;
+  }
+  
+  .stSuccess { border-left-color: #FFFFFF !important; }
+  .stInfo { border-left-color: #888888 !important; }
+  .stWarning { border-left-color: #FFD700 !important; }
+  .stError { border-left-color: #FF4444 !important; }
+  
+  /* Progress bar */
+  .stProgress > div > div {
+      background: #FFFFFF !important;
+  }
+  
+  /* Feature Cards - Minimal */
+  .feat-card {
+      background: #0A0A0A;
+      border: 1px solid #333333;
+      border-radius: 10px;
+      padding: 14px;
+      margin: 6px 0;
+      transition: all 0.2s ease;
+  }
+  
+  .feat-card:hover {
+      border-color: #FFFFFF;
+      transform: translateX(2px);
+  }
+  
+  /* Citation blocks */
+  .citation {
+      background: #0A0A0A;
+      border-left: 3px solid #FFFFFF;
+      padding: 10px 14px;
+      margin: 8px 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 12px;
+      color: #CCCCCC;
+  }
+  
+  /* Roadmap cards */
+  .road-card {
+      background: #0A0A0A;
+      border: 1px solid #333333;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+  }
+  
+  .road-card:hover {
+      border-color: #FFFFFF;
+  }
+  
+  /* Stats pills */
+  .stat-pill {
+      display: inline-block;
+      background: #1A1A1A;
+      border: 1px solid #333333;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      margin: 4px;
+      color: #CCCCCC;
+  }
+  
   /* Version badge */
-  .v-badge{display:inline-block;background:#34d39922;border:1px solid #34d399;color:#34d399;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:600;}
-
-  /* Feature card */
-  .feat-card{background:#0a1528;border:1px solid #1e293b;border-radius:10px;padding:14px;margin:6px 0;}
-  .feat-card:hover{border-color:#34d39944;}
-
-  /* Road map */
-  .road-card{background:#0a1528;border:1px solid #1e293b;border-radius:10px;padding:12px 16px;margin:6px 0;display:flex;justify-content:space-between;align-items:flex-start;}
-
-  /* Analytics */
-  .stat-pill{display:inline-block;background:#0f1f38;border:1px solid #1e293b;border-radius:20px;padding:4px 14px;font-size:12px;margin:4px;}
-
-  /* Progress */
-  .stProgress>div>div{background:linear-gradient(90deg,#34d399,#059669)!important;}
-
-  /* Success/warning */
-  .stSuccess{background:#0a1f14!important;border:1px solid #34d399!important;}
-  .stWarning{background:#1a1000!important;border:1px solid #f59e0b!important;}
-  .stInfo{background:#0a1528!important;border:1px solid #60a5fa44!important;}
-
-  /* Scrollbar */
-  ::-webkit-scrollbar{width:4px;}
-  ::-webkit-scrollbar-track{background:#050810;}
-  ::-webkit-scrollbar-thumb{background:#1e293b;border-radius:2px;}
+  .v-badge {
+      display: inline-block;
+      background: #1A1A1A;
+      border: 1px solid #FFFFFF;
+      color: #FFFFFF;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+  }
+  
+  /* Status tags */
+  .status-tag {
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      background: #1A1A1A;
+      border: 1px solid #333333;
+      color: #CCCCCC;
+  }
+  
+  /* Scrollbar - Minimal */
+  ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+      background: #000000;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+      background: #333333;
+      border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+      background: #FFFFFF;
+  }
+  
+  /* File uploader */
+  .stFileUploader > div > button {
+      background: #1A1A1A !important;
+      border: 1px solid #333333 !important;
+      color: #FFFFFF !important;
+  }
+  
+  /* Code blocks */
+  code, pre {
+      background: #0A0A0A !important;
+      color: #FFFFFF !important;
+      border: 1px solid #333333 !important;
+  }
+  
+  /* Spinner */
+  .stSpinner > div {
+      border-color: #FFFFFF !important;
+  }
 </style>
-
-
 """, unsafe_allow_html=True)
 
-# ── API Key ───────────────────────────────────────────────────────────────────
+# API Key
 api_key = st.secrets.get("GROQ_API_KEY", "")
 
-# ── Session state ─────────────────────────────────────────────────────────────
+# Session state
 defaults = {
     "chat_history": [],
     "lang_mode": "اردو",
@@ -104,7 +372,7 @@ for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
 
-# ── System prompts ─────────────────────────────────────────────────────────────
+# System prompts
 SYSTEM_PROMPTS = {
     "اردو": """آپ ایک مددگار پاکستانی AI اسسٹنٹ ہیں۔
 صرف اردو میں جواب دیں۔ جواب کے شروع میں کوئی انگریزی لفظ یا code نہ لکھیں۔
@@ -149,8 +417,6 @@ def extract_pdf_text(uploaded_file):
             return ""
 
 def chunk_text(text, chunk_size=600, overlap=80):
-    """Smart chunking — split on paragraphs first, then by size."""
-    # Split on double newlines (paragraphs)
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
     chunks = []
     current = ""
@@ -163,7 +429,6 @@ def chunk_text(text, chunk_size=600, overlap=80):
             current = para
     if current:
         chunks.append(current)
-    # If no paragraphs found, fall back to word chunks
     if not chunks:
         words = text.split()
         i = 0
@@ -173,21 +438,16 @@ def chunk_text(text, chunk_size=600, overlap=80):
     return chunks
 
 def find_relevant_chunks(query, chunks, top_k=3):
-    """Better retrieval — score by word frequency not just overlap."""
     query_words = query.lower().split()
     scored = []
     for i, chunk in enumerate(chunks):
         chunk_lower = chunk.lower()
-        # Count how many times each query word appears
         score = sum(chunk_lower.count(w) for w in query_words if len(w) > 2)
-        # Bonus for exact phrase match
         if query.lower() in chunk_lower:
             score += 10
         scored.append((score, i, chunk))
     scored.sort(reverse=True)
-    # Filter out zero-score chunks
     relevant = [c for s, _, c in scored if s > 0][:top_k]
-    # If nothing found, return first chunks
     if not relevant:
         relevant = chunks[:top_k]
     return relevant
@@ -199,38 +459,43 @@ def export_chat_txt():
         lines.append(f"{role}:\n{msg['content']}\n")
     return "\n".join(lines)
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+# Sidebar
 with st.sidebar:
-    st.markdown("## 🇵🇰 اردو AI v3")
-
+    st.markdown("## 🇵🇰 اردو AI")
+    st.markdown("---")
+    
     if not api_key:
         api_key = st.text_input("Groq API Key", type="password", placeholder="gsk_...")
-        st.markdown('<span style="color:#4a6a8a;font-size:10px">Free key: console.groq.com</span>', unsafe_allow_html=True)
+        st.caption("Get your free API key at console.groq.com")
     else:
-        st.markdown('<span style="color:#34d399;font-size:11px">✅ API Key configured</span>', unsafe_allow_html=True)
-
+        st.success("✓ API Key configured")
+    
     model = st.selectbox("Model", ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"])
-    st.divider()
-
-    st.markdown("### 🌐 LANGUAGE")
-    lang_mode = st.radio("Mode", ["اردو", "English", "Mixed (اردو + English)"],
-        index=["اردو", "English", "Mixed (اردو + English)"].index(st.session_state.lang_mode))
+    st.markdown("---")
+    
+    st.markdown("### Language")
+    lang_mode = st.radio(
+        "Mode", 
+        ["اردو", "English", "Mixed (اردو + English)"],
+        index=["اردو", "English", "Mixed (اردو + English)"].index(st.session_state.lang_mode)
+    )
     if lang_mode != st.session_state.lang_mode:
         st.session_state.lang_mode = lang_mode
-    st.divider()
-
-    st.markdown("### 📊 SESSION STATS")
+    
+    st.markdown("---")
+    st.markdown("### Session")
     total = len([m for m in st.session_state.chat_history if m["role"] == "user"])
-    st.markdown(f'<span class="stat-pill">💬 {total} questions</span>', unsafe_allow_html=True)
-    st.markdown(f'<span class="stat-pill">📄 {st.session_state.rag_filename or "No doc"}</span>', unsafe_allow_html=True)
-    st.divider()
-
-    st.markdown("### 🛠️ ACTIONS")
+    st.markdown(f'<span class="stat-pill">💬 {total} Questions</span>', unsafe_allow_html=True)
+    st.markdown(f'<span class="stat-pill">📄 {st.session_state.rag_filename or "No Document"}</span>', unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.markdown("### Actions")
+    
     if st.button("🗑 Clear Chat", use_container_width=True):
         st.session_state.chat_history = []
         st.session_state.last_input = ""
         st.rerun()
-
+    
     if st.session_state.chat_history:
         export_data = export_chat_txt()
         st.download_button(
@@ -240,47 +505,40 @@ with st.sidebar:
             mime="text/plain",
             use_container_width=True,
         )
-    st.divider()
+    
+    st.markdown("---")
+    st.caption("Built with Llama 3 • Fine-tuned on Pakistani Corpus")
 
-    st.markdown("""<span style="color:#4a6a8a;font-size:10px">
-    Base: Llama 3.2-1B-Instruct<br>
-    Fine-tuned: Pakistani Corpus<br>
-    HF: Nimra28/urdu-llama-pakistan<br>
-    <b style="color:#34d399">Version: v3.0 Final</b>
-    </span>""", unsafe_allow_html=True)
-
-# ── Header ─────────────────────────────────────────────────────────────────────
-c1, c2 = st.columns([5, 1])
+# Header
+c1, c2, c3 = st.columns([4, 1, 1])
 with c1:
-    st.markdown("# 🇵🇰 اردو AI — پاکستانی زبان کا ذہین ماڈل")
-    st.markdown("#### Pakistan's First Open-Source Urdu LLM Platform · Fine-tuned on Pakistani Corpus")
-with c2:
-    st.markdown('<div style="margin-top:20px"><span class="v-badge">v3.0 Final</span></div>', unsafe_allow_html=True)
-st.divider()
+    st.markdown("# 🇵🇰 اردو AI")
+    st.caption("Pakistan's Open-Source Urdu LLM Platform")
+with c3:
+    st.markdown('<div style="text-align: right; margin-top: 20px;"><span class="v-badge">v3.0</span></div>', unsafe_allow_html=True)
 
-# ── Tabs ───────────────────────────────────────────────────────────────────────
+st.markdown("---")
+
+# Tabs
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-    "💬 CHAT", "🎙️ VOICE", "📄 RAG — URDU DOCS",
-    "📊 COMPARISON", "🔮 ROADMAP", "📚 ABOUT"
+    "💬 Chat", "🎙️ Voice", "📄 RAG", "📊 Compare", "🔮 Roadmap", "ℹ️ About"
 ])
 
-# ══════════════════════════════════════════════════════════════════════════════
-# TAB 1 — CHAT
-# ══════════════════════════════════════════════════════════════════════════════
-with tab1:
-    st.markdown("### 💬 اردو AI سے بات کریں")
+# TAB 1 for CHAT
 
+with tab1:
+    st.markdown("### 💬 Conversation")
+    
     quick_prompts = [
-        "پاکستان کی تاریخ بتائیں", "علامہ اقبال کی شاعری",
-        "اسلام میں زکوٰۃ کیا ہے؟", "Machine learning سمجھائیں",
-        "لاہور کے مشہور کھانے", "پاکستان کا آئین کب بنا؟",
-        "CSS امتحان کی تیاری", "پاکستانی شادی کی رسمیں",
+        "پاکستان کی تاریخ", "علامہ اقبال کی شاعری",
+        "اسلام میں زکوٰۃ", "Machine learning",
+        "لاہور کے کھانے", "پاکستان کا آئین",
     ]
-    st.markdown('<span style="color:#4a6a8a;font-size:11px">⚡ مثالی سوالات:</span>', unsafe_allow_html=True)
-    cols = st.columns(4)
+    
+    cols = st.columns(6)
     for i, qp in enumerate(quick_prompts):
-        with cols[i % 4]:
-            if st.button(qp[:18], key=f"qp_{i}", use_container_width=True):
+        with cols[i]:
+            if st.button(qp, key=f"qp_{i}", use_container_width=True):
                 last = st.session_state.chat_history[-1]["content"] if st.session_state.chat_history else ""
                 if last != qp and not st.session_state.processing:
                     st.session_state.processing = True
@@ -290,94 +548,76 @@ with tab1:
                         st.session_state.chat_history.append({"role": "assistant", "content": reply})
                     st.session_state.processing = False
                     st.rerun()
-
-    st.divider()
-
+    
+    st.markdown("---")
+    
     # Chat display
     chat_container = st.container()
     with chat_container:
         if not st.session_state.chat_history:
-            st.markdown('<div class="chat-urdu">السلام علیکم! میں اردو AI v3 ہوں — پاکستان کا پہلا اردو ذہین ماڈل۔ آپ مجھ سے اردو یا انگریزی میں بات کر سکتے ہیں، Urdu دستاویزات پر سوال پوچھ سکتے ہیں، اور آواز سے بھی بات کر سکتے ہیں۔ 🇵🇰</div>', unsafe_allow_html=True)
-
+            st.markdown('<div class="chat-urdu">السلام علیکم! میں اردو AI ہوں — پاکستان کا اردو ذہین ماڈل۔ میں اردو یا انگریزی میں بات کر سکتا ہوں۔ 🇵🇰</div>', unsafe_allow_html=True)
+        
         for msg in st.session_state.chat_history:
             if msg["role"] == "user":
                 st.markdown(f'<div class="chat-user">👤 {msg["content"]}</div>', unsafe_allow_html=True)
             else:
                 css = "chat-urdu" if lang_mode == "اردو" else ("chat-mixed" if "Mixed" in lang_mode else "chat-en")
                 st.markdown(f'<div class="{css}">🇵🇰 {msg["content"]}</div>', unsafe_allow_html=True)
-
-    # Input — text_area supports Urdu/RTL properly
-    st.markdown("")
-    st.markdown('<span style="color:#4a6a8a;font-size:11px">💡 اردو لکھنے کے لیے: Windows key + Space (Urdu keyboard) یا Google Urdu Input</span>', unsafe_allow_html=True)
+    
+    # Input
     user_input = st.text_area(
-        "سوال لکھیں",
-        placeholder="یہاں اردو یا انگریزی میں سوال لکھیں\nUrdu ya English mein likhen...",
+        "Your message",
+        placeholder="Type your question here in Urdu or English...",
         label_visibility="collapsed",
         key="chat_in",
-        height=80,
+        height=100,
     )
-    send_col, clear_col = st.columns([3, 1])
-    with send_col:
-        send = st.button("بھیجیں ➤ Send", use_container_width=True, type="primary",
-                          disabled=st.session_state.processing)
-    with clear_col:
-        st.markdown("")
-
+    
+    col1, col2, col3 = st.columns([1, 1, 4])
+    with col1:
+        send = st.button("Send →", use_container_width=True, type="primary",
+                         disabled=st.session_state.processing)
+    
     if send and user_input and user_input.strip() and api_key and not st.session_state.processing:
         user_input = user_input.strip()
         if user_input != st.session_state.last_input:
             st.session_state.last_input = user_input
             st.session_state.processing = True
             st.session_state.chat_history.append({"role": "user", "content": user_input})
-            with st.spinner("سوچ رہا ہوں..."):
+            with st.spinner("Thinking..."):
                 reply = get_ai_response(user_input, st.session_state.chat_history[:-1], lang_mode, model, api_key)
             st.session_state.chat_history.append({"role": "assistant", "content": reply})
             st.session_state.processing = False
             st.rerun()
-
+    
     if not api_key:
-        st.warning("⚠️ Groq API key درکار ہے")
+        st.warning("⚠️ Please configure your Groq API key in the sidebar")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# TAB 2 — VOICE INPUT (using audio upload + Groq Whisper)
-# ══════════════════════════════════════════════════════════════════════════════
+# TAB 2 for VOICE INPUT
 with tab2:
-    st.markdown("### 🎙️ VOICE INPUT — آواز سے بات کریں")
-    st.markdown('<span style="color:#4a6a8a;font-size:12px">Record your voice → Upload → AI transcribes in Urdu → Responds automatically</span>', unsafe_allow_html=True)
-
-    st.markdown("""
-    <div style="background:#0a1f14;border:1px solid #064e3b;border-radius:12px;padding:20px;margin:10px 0">
-      <h4 style="color:#34d399;margin:0 0 12px 0">📱 HOW TO USE VOICE INPUT</h4>
-      <div style="color:#94a3b8;font-size:13px;line-height:2">
-        <b style="color:#34d399">Step 1:</b> Record voice on your phone (Voice Recorder app) or PC (Sound Recorder)<br>
-        <b style="color:#34d399">Step 2:</b> Save as MP3, WAV, M4A, or OGG<br>
-        <b style="color:#34d399">Step 3:</b> Upload below — AI will transcribe and answer<br>
-        <b style="color:#34d399">Tip:</b> Speak clearly in Urdu or English
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
-
+    st.markdown("### 🎙️ Voice Input")
+    st.markdown("Upload an audio file for transcription and response")
+    
     audio_file = st.file_uploader(
-        "Upload voice recording (MP3, WAV, M4A, OGG)",
+        "Upload audio (MP3, WAV, M4A, OGG)",
         type=["mp3", "wav", "m4a", "ogg", "webm"],
         key="voice_upload"
     )
-
-    v1, v2 = st.columns(2)
-    with v1:
+    
+    col1, col2 = st.columns(2)
+    with col1:
         vlang = st.selectbox("Transcription Language", ["ur", "en"], 
-                             format_func=lambda x: "اردو (Urdu)" if x=="ur" else "English",
+                             format_func=lambda x: "Urdu" if x=="ur" else "English",
                              key="vlang")
-    with v2:
+    with col2:
         resp_lang = st.selectbox("Response Language", ["اردو", "English", "Mixed (اردو + English)"], key="resp_lang")
-
+    
     if audio_file and api_key:
         st.audio(audio_file)
-        if st.button("🎙️ TRANSCRIBE & GET ANSWER", type="primary", use_container_width=True):
-            with st.spinner("آواز سن رہا ہوں..."):
+        if st.button("Transcribe & Respond", type="primary", use_container_width=True):
+            with st.spinner("Processing audio..."):
                 try:
-                    from groq import Groq
                     client = Groq(api_key=api_key)
                     audio_bytes = audio_file.read()
                     transcription = client.audio.transcriptions.create(
@@ -387,125 +627,113 @@ with tab2:
                         response_format="text",
                     )
                     transcript_text = str(transcription).strip()
-                    st.success(f"✅ Transcribed: {transcript_text}")
-
-                    with st.spinner("جواب آ رہا ہے..."):
+                    st.success(f"Transcribed: {transcript_text}")
+                    
+                    with st.spinner("Generating response..."):
                         reply = get_ai_response(transcript_text, [], resp_lang, model, api_key)
-
-                    st.markdown("### 🇵🇰 Response")
+                    
+                    st.markdown("### Response")
                     css = "chat-urdu" if resp_lang == "اردو" else "chat-en"
                     st.markdown(f'<div class="{css}">{reply}</div>', unsafe_allow_html=True)
-
+                    
                     st.session_state.chat_history.append({"role": "user", "content": f"🎙️ {transcript_text}"})
                     st.session_state.chat_history.append({"role": "assistant", "content": reply})
-
+                    
                 except Exception as e:
-                    st.error(f"Transcription error: {e}")
-
-    st.divider()
-    st.markdown("### ✏️ OR TYPE / PASTE YOUR QUESTION")
-    voice_text = st.text_area("Type your question here", height=100,
-                               placeholder="آپ کا سوال یہاں لکھیں...\nType your question here...",
-                               key="voice_type")
-    if st.button("🚀 Get Response from Text", use_container_width=True) and voice_text and api_key:
-        with st.spinner("جواب آ رہا ہے..."):
-            reply = get_ai_response(voice_text, [], resp_lang if "resp_lang" in st.session_state else "اردو", model, api_key)
+                    st.error(f"Error: {e}")
+    
+    st.markdown("---")
+    st.markdown("### Or type your question")
+    voice_text = st.text_area("Type here", height=100, key="voice_type")
+    if st.button("Get Response", use_container_width=True) and voice_text and api_key:
+        with st.spinner("Thinking..."):
+            reply = get_ai_response(voice_text, [], st.session_state.get("resp_lang", "اردو"), model, api_key)
         css = "chat-urdu" if st.session_state.get("resp_lang","اردو") == "اردو" else "chat-en"
         st.markdown(f'<div class="{css}">{reply}</div>', unsafe_allow_html=True)
         st.session_state.chat_history.append({"role": "user", "content": voice_text})
         st.session_state.chat_history.append({"role": "assistant", "content": reply})
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# TAB 3 — RAG ON URDU DOCS
-# ══════════════════════════════════════════════════════════════════════════════
+# TAB 3 for RAG
 with tab3:
-    st.markdown("### 📄 RAG — URDU DOCUMENT Q&A")
-    st.markdown('<span style="color:#4a6a8a;font-size:12px">Upload any Urdu PDF or text file — ask questions, get answers with citations</span>', unsafe_allow_html=True)
-
-    r_tab1, r_tab2 = st.tabs(["📎 Upload Document", "📝 Paste Text"])
-
-    with r_tab1:
-        uploaded = st.file_uploader("Upload Urdu PDF or TXT", type=["pdf", "txt"], key="rag_upload")
+    st.markdown("### 📄 Document Q&A")
+    st.caption("Upload Urdu documents and ask questions")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        uploaded = st.file_uploader("Upload PDF or TXT", type=["pdf", "txt"], key="rag_upload")
         if uploaded:
-            with st.spinner("📖 Reading document..."):
+            with st.spinner("Reading document..."):
                 if uploaded.name.endswith(".pdf"):
                     text = extract_pdf_text(uploaded)
                 else:
                     text = uploaded.read().decode("utf-8", errors="ignore")
-
+            
             if text:
                 chunks = chunk_text(text)
                 st.session_state.rag_chunks = chunks
                 st.session_state.rag_filename = uploaded.name
-                st.success(f"✅ Loaded: {uploaded.name} — {len(text.split())} words, {len(chunks)} chunks")
-                with st.expander("👁 Preview"):
-                    st.text(text[:1000] + "…")
+                st.success(f"Loaded: {uploaded.name}")
+                with st.expander("Preview"):
+                    st.text(text[:500] + "…")
             else:
-                st.error("Could not extract text from this file.")
-
-    with r_tab2:
-        pasted_doc = st.text_area("Paste Urdu text here", height=200,
-            placeholder="یہاں اردو متن paste کریں...", key="rag_paste")
-        if st.button("📥 Load Text", use_container_width=True):
+                st.error("Could not extract text")
+    
+    with col2:
+        pasted_doc = st.text_area("Or paste text here", height=150, key="rag_paste")
+        if st.button("Load Text", use_container_width=True):
             if pasted_doc.strip():
                 chunks = chunk_text(pasted_doc)
                 st.session_state.rag_chunks = chunks
                 st.session_state.rag_filename = "Pasted Text"
-                st.success(f"✅ Loaded — {len(pasted_doc.split())} words, {len(chunks)} chunks")
-
-    st.divider()
-
+                st.success(f"Loaded: {len(pasted_doc.split())} words")
+    
     if st.session_state.rag_chunks:
-        st.markdown(f"#### 🔍 Ask Questions About: `{st.session_state.rag_filename}`")
-        rag_q = st.text_area("Your question about the document",
-            placeholder="اس دستاویز کے بارے میں سوال کریں...\nExample: اس سورت کا مرکزی موضوع کیا ہے؟",
-            height=80, key="rag_q")
-        rag_lang = st.selectbox("Answer in", ["اردو", "English"], key="rag_lang")
-
-        if st.button("🔍 SEARCH & ANSWER", type="primary", use_container_width=True):
+        st.markdown("---")
+        st.markdown(f"**Active Document:** `{st.session_state.rag_filename}`")
+        
+        rag_q = st.text_area("Ask a question about this document", height=80, key="rag_q")
+        rag_lang = st.selectbox("Response Language", ["اردو", "English"], key="rag_lang")
+        
+        if st.button("Search & Answer", type="primary", use_container_width=True):
             if rag_q and api_key:
-                with st.spinner("دستاویز میں تلاش کر رہا ہوں..."):
+                with st.spinner("Searching document..."):
                     relevant = find_relevant_chunks(rag_q, st.session_state.rag_chunks)
                     context = "\n\n---\n\n".join(relevant)
-                    rag_system = f"""You are a helpful assistant answering questions about a document.
-Use the provided context to answer accurately and in detail.
-If the exact answer is not in the context, explain what IS in the context and say what is missing.
-Answer in {'اردو زبان میں جواب دیں۔ صاف اور مکمل اردو استعمال کریں۔' if rag_lang == 'اردو' else 'English with clear structure.'}.
-Document context:
+                    rag_system = f"""Answer the question based on the context provided.
+Context:
 {context}
 
-Answer the question: {rag_q}"""
-                    answer = get_ai_response(rag_q, [], rag_lang, model, api_key, system_override=rag_system)
+Question: {rag_q}
 
-                st.markdown("#### 📋 Answer")
+Answer in {'Urdu' if rag_lang == 'اردو' else 'English'}."""
+                    
+                    answer = get_ai_response(rag_q, [], rag_lang, model, api_key, system_override=rag_system)
+                
+                st.markdown("#### Answer")
                 css = "chat-urdu" if rag_lang == "اردو" else "chat-en"
                 st.markdown(f'<div class="{css}">{answer}</div>', unsafe_allow_html=True)
-
-                st.markdown("#### 📌 Source Chunks Used")
-                for i, chunk in enumerate(relevant):
-                    st.markdown(f'<div class="citation">📄 Chunk {i+1}: {chunk[:200]}…</div>', unsafe_allow_html=True)
-
-                # Add to chat history
+                
+                with st.expander("View source chunks"):
+                    for i, chunk in enumerate(relevant):
+                        st.markdown(f'<div class="citation">Chunk {i+1}: {chunk[:300]}…</div>', unsafe_allow_html=True)
+                
                 st.session_state.chat_history.append({"role": "user", "content": f"📄 [{st.session_state.rag_filename}] {rag_q}"})
                 st.session_state.chat_history.append({"role": "assistant", "content": answer})
-    else:
-        st.info("📂 Upload a document above to start asking questions about it.")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# TAB 4 — MODEL COMPARISON
-# ══════════════════════════════════════════════════════════════════════════════
+# TAB 4 for COMPARISON
 with tab4:
-    st.markdown("### 📊 BASE MODEL vs FINE-TUNED URDU LLM")
-    st.markdown('<span style="color:#4a6a8a;font-size:12px">See the exact difference fine-tuning on Pakistani corpus makes</span>', unsafe_allow_html=True)
-
-    cmp_q = st.text_input("Test question", value="پاکستان کی ثقافت کے بارے میں بتائیں", key="cmp_q")
-
-    if st.button("⚡ RUN COMPARISON", type="primary", use_container_width=True):
+    st.markdown("### 📊 Model Comparison")
+    st.caption("Base Llama vs Fine-tuned Urdu Model")
+    
+    cmp_q = st.text_input("Test Question", value="پاکستان کی ثقافت کے بارے میں بتائیں", key="cmp_q")
+    
+    if st.button("Run Comparison", type="primary", use_container_width=True):
         if api_key:
             client = Groq(api_key=api_key)
-            with st.spinner("Running both models..."):
+            with st.spinner("Running comparison..."):
                 base = client.chat.completions.create(
                     model=model, max_tokens=400,
                     messages=[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":cmp_q}],
@@ -516,113 +744,98 @@ with tab4:
                 )
             st.session_state.comparison_base = base.choices[0].message.content.strip()
             st.session_state.comparison_ft = clean_response(ft.choices[0].message.content)
-
+    
     if st.session_state.comparison_base:
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown("#### 🤖 Base Llama 3 (No Fine-tuning)")
-            st.markdown(f'<div class="chat-en" style="min-height:180px">{st.session_state.comparison_base}</div>', unsafe_allow_html=True)
-            st.caption("❌ Generic — no Pakistani/Urdu context")
-        with c2:
-            st.markdown("#### 🇵🇰 Fine-tuned Urdu LLM")
-            st.markdown(f'<div class="chat-urdu" style="min-height:180px">{st.session_state.comparison_ft}</div>', unsafe_allow_html=True)
-            st.caption("✅ Pakistani context — Urdu with cultural depth")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("#### Base Model")
+            st.markdown(f'<div class="chat-en" style="min-height: 180px">{st.session_state.comparison_base}</div>', unsafe_allow_html=True)
+            st.caption("❌ Generic response, no Pakistani context")
+        with col2:
+            st.markdown("#### Fine-tuned Urdu Model")
+            st.markdown(f'<div class="chat-urdu" style="min-height: 180px">{st.session_state.comparison_ft}</div>', unsafe_allow_html=True)
+            st.caption("✅ Pakistani context, natural Urdu")
+    
+    st.markdown("---")
+    st.markdown("### Training Metrics")
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Training Examples", "30+")
+    m2.metric("Base Model", "Llama 3.2-1B")
+    m3.metric("Method", "QLoRA 4-bit")
+    m4.metric("LoRA Rank", "r=16")
 
-    st.divider()
-    st.markdown("### 📈 TRAINING METRICS")
-    m1,m2,m3,m4 = st.columns(4)
-    m1.metric("Training Examples","30+")
-    m2.metric("Base Model","Llama 3.2-1B")
-    m3.metric("Method","QLoRA 4-bit")
-    m4.metric("LoRA Rank","r=16")
-    m5,m6,m7,m8 = st.columns(4)
-    m5.metric("Epochs","3")
-    m6.metric("Learning Rate","2e-4")
-    m7.metric("Languages","Urdu + English")
-    m8.metric("HuggingFace","Public ✅")
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TAB 5 — ROADMAP
-# ══════════════════════════════════════════════════════════════════════════════
+# TAB 5 for ROADMAP
 with tab5:
-    st.markdown("### 🔮 URDU AI — FUTURE ROADMAP")
-    st.divider()
-
-    roadmap = [
-        ("v3.1","🗄️","Scale to 10,000+ Urdu examples — Dawn, Geo, BBC Urdu, Wikipedia","In Progress","#34d399"),
-        ("v3.2","🧠","Fine-tune Llama 3.2-3B for deeper Urdu understanding","Planned","#60a5fa"),
-        ("v3.3","🎙️","Real-time Urdu speech-to-text + text-to-speech","Planned","#60a5fa"),
-        ("v4.0","🌍","Punjabi, Sindhi, Pashto, Balochi language support","Planned","#60a5fa"),
-        ("v4.1","⚡","Release full 7B parameter Urdu LLM","Future","#a78bfa"),
-        ("v4.2","🔌","Public REST API for developers","Future","#a78bfa"),
-        ("v5.0","📊","Pakistan's first Urdu NLP benchmark","Research","#f59e0b"),
-        ("v5.1","🏥","Domain-specific models: Medical Urdu, Legal Urdu","Research","#f59e0b"),
+    st.markdown("### 🔮 Roadmap")
+    
+    roadmap_items = [
+        ("v3.1", "Scale to 10,000+ Urdu examples", "In Progress"),
+        ("v3.2", "Fine-tune Llama 3.2-3B", "Planned"),
+        ("v3.3", "Real-time speech-to-text", "Planned"),
+        ("v4.0", "Punjabi, Sindhi, Pashto support", "Planned"),
+        ("v4.1", "7B parameter Urdu LLM", "Future"),
+        ("v5.0", "Urdu NLP Benchmark", "Research"),
     ]
-
-    rc1, rc2 = st.columns(2)
-    for i, (ver, emoji, desc, status, color) in enumerate(roadmap):
-        col = rc1 if i % 2 == 0 else rc2
-        with col:
-            st.markdown(
-                f'<div class="road-card">'
-                f'<div><span style="color:{color};font-weight:700;font-size:13px">{emoji} {ver}</span>'
-                f'<div style="color:#94a3b8;font-size:12px;margin-top:4px">{desc}</div></div>'
-                f'<span style="background:{color}22;color:{color};border:1px solid {color};padding:2px 8px;border-radius:10px;font-size:10px;white-space:nowrap">{status}</span>'
-                f'</div>',
-                unsafe_allow_html=True
-            )
-
-    st.divider()
-    st.markdown("### ✅ BUGS FIXED IN v3")
+    
+    for version, desc, status in roadmap_items:
+        st.markdown(
+            f'<div class="road-card">'
+            f'<div><strong>{version}</strong><br>'
+            f'<span style="color: #888; font-size: 13px;">{desc}</span></div>'
+            f'<span class="status-tag">{status}</span>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+    
+    st.markdown("---")
+    st.markdown("### v3.0 Fixes")
     fixes = [
-        ("✅","API key hidden from UI — server-side only"),
-        ("✅","Duplicate responses fixed with session state guard"),
-        ("✅","PK prefix removed from all responses"),
-        ("✅","Comparison results persist without re-running"),
-        ("✅","Voice input tab added (Chrome)"),
-        ("✅","RAG on Urdu documents with citations"),
-        ("✅","Chat export to .txt"),
-        ("✅","Better RTL rendering with unicode-bidi"),
+        "✓ API key hidden from UI",
+        "✓ No duplicate responses",
+        "✓ Clean response formatting",
+        "✓ Persistent comparison results",
+        "✓ RAG with citations",
+        "✓ Chat export functionality",
     ]
-    fc1, fc2 = st.columns(2)
-    for i, (icon, desc) in enumerate(fixes):
-        col = fc1 if i % 2 == 0 else fc2
-        with col:
-            st.markdown(f'<div style="padding:5px 0;font-size:13px;color:#34d399">{icon} {desc}</div>', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    for i, fix in enumerate(fixes):
+        col = col1 if i < 3 else col2
+        col.markdown(fix)
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TAB 6 — ABOUT
-# ══════════════════════════════════════════════════════════════════════════════
+# TAB 6 for ABOUT
 with tab6:
-    st.markdown("### 📚 ABOUT URDU AI v3")
+    st.markdown("### ℹ️ About اردو AI")
+    
     st.markdown("""
-    <div style="background:#0a1f14;border:1px solid #064e3b;border-radius:12px;padding:20px;line-height:2.4;direction:rtl;text-align:right;font-family:'Noto Nastaliq Urdu',serif;font-size:15px">
-    اردو AI پاکستان کا پہلا open-source اردو زبان کا ذہین ماڈل ہے۔ اسے Meta کے Llama 3.2 ماڈل کو پاکستانی corpus پر fine-tune کر کے بنایا گیا ہے۔<br><br>
-    v3 میں آواز سے input، اردو دستاویزات پر سوالات، chat export اور بہتر UI شامل کی گئی ہے۔<br><br>
-    یہ ماڈل اردو اور انگریزی دونوں زبانوں میں جواب دے سکتا ہے اور پاکستانی تناظر کو سمجھتا ہے۔
+    <div style="background: #0A0A0A; border: 1px solid #333333; border-radius: 12px; padding: 24px; line-height: 1.8;">
+    <p style="font-size: 15px;"><strong>اردو AI</strong> is Pakistan's open-source Urdu language model, fine-tuned on Pakistani corpus from Meta's Llama 3.2.</p>
+    
+    <p style="font-size: 14px; color: #CCCCCC; margin-top: 16px;">
+    This model understands both Urdu and English, with deep knowledge of Pakistani culture, history, and Islamic context.
+    </p>
     </div>
     """, unsafe_allow_html=True)
-
-    st.divider()
-    st.markdown("### 🗂️ TRAINING DATA")
-    dc1,dc2,dc3 = st.columns(3)
+    
+    st.markdown("---")
+    st.markdown("### Training Data")
+    
     cats = [
-        ("📰 Urdu News","Pakistani current affairs, politics, sports"),
-        ("📚 Urdu Literature","Poetry by Iqbal, Ghalib, Mir, Faiz"),
-        ("🕌 Islamic Knowledge","Quran, Hadith, Islamic jurisprudence"),
-        ("🏛️ Pakistani History","Independence, leaders, culture"),
-        ("💬 Code-switching","Natural Urdu+English conversations"),
-        ("🎓 Education","CSS, MDCAT, academic topics"),
+        ("📰 Urdu News", "Current affairs, politics, sports"),
+        ("📚 Urdu Literature", "Poetry by Iqbal, Ghalib, Mir, Faiz"),
+        ("🕌 Islamic Knowledge", "Quran, Hadith, jurisprudence"),
+        ("🏛️ Pakistani History", "Independence, leaders, culture"),
+        ("💬 Code-switching", "Natural Urdu+English conversations"),
+        ("🎓 Education", "CSS, MDCAT, academic topics"),
     ]
-    for i,(name,desc) in enumerate(cats):
-        with [dc1,dc2,dc3][i%3]:
-            st.markdown(f'<div class="feat-card"><b style="color:#34d399">{name}</b><br><span style="color:#4a6a8a;font-size:11px">{desc}</span></div>', unsafe_allow_html=True)
-
-    st.divider()
-    st.markdown("### 🔗 LINKS")
-    st.markdown("- 🤗 **HuggingFace:** [Nimra28/urdu-llama-pakistan](https://huggingface.co/Nimra28/urdu-llama-pakistan)")
-    st.markdown("- 📓 **Colab Notebook:** Fine-tuning code on GitHub")
-    st.markdown("- ⭐ **GitHub:** [github.com/nimra-pixel/urdu-llm-pakistan](https://github.com/nimra-pixel/urdu-llm-pakistan)")
-    st.markdown("- 👩‍💻 **Built by:** Nimra Tariq — AI Engineer & Assistant Professor, Superior University, Pakistan")
+    
+    cols = st.columns(3)
+    for i, (name, desc) in enumerate(cats):
+        with cols[i % 3]:
+            st.markdown(f'<div class="feat-card"><strong>{name}</strong><br><span style="color: #888; font-size: 11px;">{desc}</span></div>', unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.markdown("### Links")
+    st.markdown("• [HuggingFace Model](https://huggingface.co/Nimra28/urdu-llama-pakistan)")
+    st.markdown("• [GitHub Repository](https://github.com/nimra-pixel/urdu-llm-pakistan)")
+    st.markdown("• Built by Nimra Tariq — AI Engineer, Superior University, Pakistan")
